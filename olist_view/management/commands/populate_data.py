@@ -1,7 +1,7 @@
 import csv
 from django.core.management.base import BaseCommand
 from olist_view.models import Customer, Geolocation, OrderItem, OrderPayment, OrderReview, Order, Seller, \
-    ProductTranslation, Product
+    ProductTranslation, Product, Alias
 
 
 class Command(BaseCommand):
@@ -36,6 +36,9 @@ class Command(BaseCommand):
 
         orders_csv_path = 'dataset_olist/olist_orders_dataset.csv'
         self.load_data(Order, orders_csv_path)
+
+        aliases_csv_path = 'dataset_olist/aliases.csv'
+        self.load_data(Alias, aliases_csv_path)
 
         self.stdout.write(self.style.SUCCESS('Data loaded successfully.'))
 

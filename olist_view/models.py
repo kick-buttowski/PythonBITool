@@ -13,29 +13,29 @@ class Product(models.Model):
     product_width_cm = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.product_id
+        return f"product: {self.product_id}"
 
 
 class Customer(models.Model):
     customer_id = models.CharField(max_length=32, unique=True)
     customer_unique_id = models.CharField(max_length=32)
-    customer_zip_code_prefix = models.CharField(max_length=10)
+    zip_code_prefix = models.CharField(max_length=10)
     customer_city = models.CharField(max_length=255)
     customer_state = models.CharField(max_length=2)
 
     def __str__(self):
-        return self.customer_id
+        return f"customer: {self.customer_id}"
 
 
 class Geolocation(models.Model):
-    geolocation_zip_code_prefix = models.IntegerField(blank=True, null=True)
+    zip_code_prefix = models.IntegerField(blank=True, null=True)
     geolocation_lat = models.FloatField()
     geolocation_lng = models.FloatField()
     geolocation_city = models.CharField(max_length=255)
     geolocation_state = models.CharField(max_length=2)
 
     def __str__(self):
-        return f"{self.geolocation_zip_code_prefix} {self.geolocation_city} {self.geolocation_state}"
+        return f"geolocation: {self.zip_code_prefix} {self.geolocation_city} {self.geolocation_state}"
 
 
 class OrderItem(models.Model):
@@ -48,7 +48,7 @@ class OrderItem(models.Model):
     freight_value = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.order_id} {self.product_id}"
+        return f"orderitem: {self.order_id} {self.product_id}"
 
 
 class OrderPayment(models.Model):
@@ -59,7 +59,7 @@ class OrderPayment(models.Model):
     payment_value = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.order_id} {self.payment_sequential} {self.payment_type}"
+        return f"orderpayment: {self.order_id} {self.payment_sequential} {self.payment_type}"
 
 
 class OrderReview(models.Model):
@@ -72,7 +72,7 @@ class OrderReview(models.Model):
     review_answer_timestamp = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.review_id
+        return f"orderreview: {self.review_id}"
 
 
 class Order(models.Model):
@@ -86,17 +86,17 @@ class Order(models.Model):
     order_estimated_delivery_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return self.order_id
+        return f"order: {self.order_id}"
 
 
 class Seller(models.Model):
     seller_id = models.CharField(max_length=32, unique=True)
-    seller_zip_code_prefix = models.CharField(max_length=10)
+    zip_code_prefix = models.CharField(max_length=10)
     seller_city = models.CharField(max_length=255)
     seller_state = models.CharField(max_length=2)
 
     def __str__(self):
-        return f"{self.seller_id} {self.seller_city}"
+        return f"seller: {self.seller_id} {self.seller_city}"
 
 
 class ProductTranslation(models.Model):
@@ -104,5 +104,13 @@ class ProductTranslation(models.Model):
     product_category_name_english = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.product_category_name
+        return f"producttranslation: {self.product_category_name}"
 
+
+class Alias(models.Model):
+    aliases = models.CharField(max_length=255, unique=True)
+    column_name = models.CharField(max_length=255, null=False)
+    table_name = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return f"{self.aliases} {self.column_name}"

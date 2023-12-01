@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Search</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica', sans-serif;
+        }
+
+        header {
+            background-color: #fff;
+            color: #333;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 0px 1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header img {
+            max-height: 50px;
+            margin-right: 10px;
+        }
+
+        nav {
+            background-color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: #333;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            font-size: 18px;
+            font-family: 'Helvetica', sans-serif;
+            padding: 10px 20px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        .content {
+            padding: 30px;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 60%;
+            height: 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 15px;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 15px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .plot-container {
+            max-width: 45%;
+            margin: auto;
+            padding-top: 20px;
+        }
+
+        .visualization-buttons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .visualization-button {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .visualization-button.active {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        .submit-button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 15px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Highlight the active nav button based on the current page */
+        nav a.active {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        .error-container {
+            max-width: 45%;
+            margin: auto;
+            margin-top: 40px;
+
+            text-align: center;
+            padding: 20px;
+            padding-bottom: 40px;
+            border-radius: 8px;
+            background-color: #f1f3f5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #dc3545;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .retry-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .retry-button:hover {
+            background-color: #0056b3;
+        }
+
+        .help-container {
+            max-width: 45%;
+            margin: auto;
+            margin-top: 40px;
+            text-align: left;
+            padding: 20px;
+            padding-bottom: 40px;
+            border-radius: 8px;
+            background-color: #f1f3f5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .help-container h1 {
+            color: #333;
+            font-size: 21px;
+            margin-bottom: 15px;
+        }
+
+        .help-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .help-container ul li {
+            font-size: 14px;
+            margin-bottom: 8px;
+            padding-left: 16px;
+        }
+
+        .help-container h1:not(:first-child) {
+            margin-top: 35px;
+        }
+
+        .help-container ul:not(:first-child) {
+            margin-top: 10px;
+        }
+
+        .help-container ul li::before {
+            content: "\2022";
+            color: #4CAF50;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .help-container .queries ul li{
+            font-size: 14px;
+            margin-bottom: 8px;
+            padding-left: 16px;
+            display: block;
+        }
+    </style>
+
+    <script>
+        function fillSearchText() {
+            var searchTextBox = document.getElementById('search_text');
+            var submittedSearchText = "{{ search_text }}";
+            if (searchTextBox && submittedSearchText) {
+                searchTextBox.value = submittedSearchText;
+            }
+        }
+        window.onload = fillSearchText;
+
+        function setQuery(query) {
+            document.getElementById('search_text').value = query;
+        }
+
+    </script>
+
+</head>
+<body>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <header>
+        <img src="{% static 'olist_view/uchicago.png' %}" alt="Logo">
+        <nav>
+            <a href="{% url 'dashboard_view' %}" {% if request.resolver_match.url_name == 'dashboard_view' %}class="active"{% endif %}>Dashboard</a>
+            <a href="{% url 'search_view' %}" {% if request.resolver_match.url_name == 'search_view' %}class="active"{% endif %}>Search</a>
+            <a href="{% url 'about_view' %}" {% if request.resolver_match.url_name == 'about_view' %}class="active"{% endif %}>About</a>
+        </nav>
+    </header>
+
+    <div class="content">
+        <form method="post" action="{% url 'search_view' %}">
+            {% csrf_token %}
+            <label for="search_text"></label>
+            <input type="text" id="search_text" name="search_text" placeholder="Enter your search text">
+            <button type="submit" class="submit-button">Search</button>
+
+            {% if search_text != "" and plot_div != "DISPLAY ERROR MESSAGE" and search_text != "help" and search_text != "help olist"%}
+                <div class="plot-container">
+                    <div class="visualization-buttons">
+                        <button type="submit" name="plot_type" value="bar" class="visualization-button {% if plot_type == 'bar' %}active{% endif %}">Bar</button>
+                        <button type="submit" name="plot_type" value="line" class="visualization-button {% if plot_type == 'line' %}active{% endif %}">Line</button>
+                        <button type="submit" name="plot_type" value="scatter" class="visualization-button {% if plot_type == 'scatter' %}active{% endif %}">Scatter</button>
+                        <button type="submit" name="plot_type" value="pie" class="visualization-button {% if plot_type == 'pie' %}active{% endif %}">Pie</button>
+                    </div>
+                    {{ plot_div | safe }}
+                </div>
+            {% endif %}
+
+            {% if plot_div == "DISPLAY ERROR MESSAGE"%}
+                <div class="error-container">
+                    <h1>Error</h1>
+                    <p style="margin-bottom:30px">Failed to recognize the query. Please try again later.</p>
+                    <a href="{% url 'search_view' %}" class="retry-button">Retry</a>
+                </div>
+            {% endif %}
+
+            {% if search_text == "help" or search_text == "help olist" %}
+                <div class="help-container">
+                    <div class="queries">
+                        <h1>Help</h1>
+                        <ul>
+                            <li><a href="javascript:void(0);" onclick="setQuery('show payment value data by payment type')">show payment value data by payment type</a></li>
+                            <li><a href="javascript:void(0);" onclick="setQuery('show another query')">show another query</a></li>
+                        </ul>
+                    </div>
+
+                    <h1>Measures</h1>
+                    <ul>
+                        <li>price</li>
+                        <li>freight value</li>
+                        <li>payment installments</li>
+                        <li>payment value</li>
+                        <li>review score</li>
+                        <li>product stock</li>
+                        <li>product weight</li>
+                        <li>product length</li>
+                        <li>product width</li>
+                        <li>product height</li>
+                    </ul>
+
+                    <h1>Dimensions</h1>
+                    <ul>
+                        <li>customer zip code</li>
+                        <li>customer city</li>
+                        <li>customer state</li>
+                        <li>latitude</li>
+                        <li>longitude</li>
+                        <li>geolocation city</li>
+                        <li>geolocation state</li>
+                        <li>shipping limit date</li>
+                        <li>payment sequential</li>
+                        <li>payment type</li>
+                        <li>review comment title</li>
+                        <li>review comment message</li>
+                        <li>review creation date</li>
+                        <li>review answer timestamp</li>
+                        <li>order status</li>
+                        <li>order purchase timestamp</li>
+                        <li>order approved at</li>
+                        <li>order delivered carrier date</li>
+                        <li>order delivered customer date</li>
+                        <li>order estimated delivery date</li>
+                        <li>product category name</li>
+                        <li>product name length</li>
+                        <li>product description length</li>
+                        <li>seller zip code</li>
+                        <li>seller city</li>
+                        <li>seller state</li>
+                    </ul>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
