@@ -5,32 +5,31 @@ from olist_view.models import (Alias, Customer, Seller, Product, ProductTranslat
 
 def table_to_model_name(table_name):
     if table_name == 'olist_view_customer':
-        return Customer
+        return Customer, 'customer'
     elif table_name == 'olist_view_geolocation':
-        return Geolocation
+        return Geolocation, 'geolocation'
     elif table_name == 'olist_view_orderitem':
-        return OrderItem
+        return OrderItem, 'orderitem'
     elif table_name == 'olist_view_orderpayment':
-        return OrderPayment
+        return OrderPayment, 'orderpayment'
     elif table_name == 'olist_view_orderreview':
-        return OrderReview
+        return OrderReview, 'orderreview'
     elif table_name == 'olist_view_order':
-        return Order
+        return Order, 'order'
     elif table_name == 'olist_view_product':
-        return Product
+        return Product, 'product'
     elif table_name == 'olist_view_seller':
-        return Seller
+        return Seller, 'seller'
     elif table_name == 'olist_view_producttranslation':
-        return ProductTranslation
-
-
-aliases = {alias.aliases.lower(): {"column_name": alias.column_name,
-                                   "table_name": alias.table_name,
-                                   "model_name": table_to_model_name(alias.table_name)} for alias in
-           Alias.objects.all()}
+        return ProductTranslation, 'producttranslation'
 
 
 def extract_information(query):
+    aliases = {alias.aliases.lower(): {"column_name": alias.column_name,
+                                       "table_name": alias.table_name,
+                                       "model_name": table_to_model_name(alias.table_name)[0]} for alias in
+               Alias.objects.all()}
+
     show_data_pattern = re.compile(r'(show|display)? (\w+(\s\w+)*) (data|results)? by (\w+(\s\w+)*)')
     top_pattern = re.compile(r'(show|display)? top (\d+) (\w+(\s\w+)*) by (\w+(\s\w+)*)')
     filtered_pattern = re.compile(r'(show|display)? (\w+(\s\w+)*) by (\w+(\s\w+)*) (but|where) (\w+(\s\w+)*) is (\w+('

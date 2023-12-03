@@ -51,48 +51,35 @@
             color: #fff;
         }
 
-        .dashboard-container {
-            display: flex;
-            flex-wrap: wrap; /* Allow items to wrap to the next line */
-            justify-content: space-around; /* Adjust as needed */
-        }
-
         .content {
             padding: 30px;
             box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .square-box {
-            position: relative;
-            width: 16vw;
-            height: 20vh;
-            background-color: #fff;
-            border: 2px solid #c0c0c0;
-            border-radius: 8px;
-            margin: 20px;
+        .dashboard-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-wrap: wrap;
             justify-content: center;
-            cursor: pointer;
-            text-decoration: none;
-            color: #333;
         }
 
-        .globe-symbol {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            text-decoration: none;
-            font-size: 20px;
-        }
+        .individual-graph {
+            max-width: 45%;
+            margin: auto;
+            margin-top: 40px;
 
-        .square-box:hover {
-            background-color: #f0f0f0; /* Darker grey on hover */
+            text-align: center;
+            padding: 20px;
+            padding-bottom: 40px;
+            border-radius: 8px;
+            background-color: #f1f3f5;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <header>
         <img src="{% static 'olist_view/uchicago.png' %}" alt="Logo">
         <nav>
@@ -103,12 +90,10 @@
     </header>
 
     <div class="content">
+        <h2  style="justify-content: center;">Dashboard {{dashboard_name}}</h2>
         <div class="dashboard-container">
-            {% for dashboard in dashboards %}
-                <a href="{% url 'dashboard_view' %}{{ dashboard }}" class="square-box">
-                    <span class="globe-symbol">🌐</span>
-                    {{ dashboard }}
-                </a>
+            {% for individual_graph in dashboard_content %}
+            <div class="individual-graph"> {{ individual_graph | safe }} </div>
             {% endfor %}
         </div>
     </div>

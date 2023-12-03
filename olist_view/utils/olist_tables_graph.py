@@ -26,15 +26,20 @@ def shortest_path(source_table, target_table):
         return None
 
 
-source_table = 'olist_view_orderreview'
-target_table = 'olist_view_geolocation'
+def example_graph():
+    source_table = 'olist_view_orderreview'
+    target_table = 'olist_view_geolocation'
 
-result = shortest_path(source_table, target_table)
+    result = shortest_path(source_table, target_table)
 
-if result:
-    path, keys = result
-    print(f"Shortest path from {source_table} to {target_table}:")
-    print(" -> ".join(path))
-    print("Keys:", keys)
-else:
-    print(f"No path found from {source_table} to {target_table}.")
+    if result:
+        path, keys = result
+        print(f"Shortest path from {source_table} to {target_table}:")
+        print(" -> ".join(path))
+        print("Keys:", keys)
+    else:
+        print(f"No path found from {source_table} to {target_table}.")
+
+
+if __name__ == '__main__':
+    example_graph()

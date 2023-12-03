@@ -95,6 +95,18 @@
             padding-top: 20px;
         }
 
+        .save-button {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+        }
+
         .visualization-buttons {
             margin-top: 25px;
             display: flex;
@@ -231,6 +243,7 @@
             padding-left: 16px;
             display: block;
         }
+
     </style>
 
     <script>
@@ -247,6 +260,15 @@
             document.getElementById('search_text').value = query;
         }
 
+        function promptForDashboardName() {
+            var dashboardName = window.prompt("Enter Dashboard Name:");
+            if (dashboardName != null) {
+                document.getElementById('dashboard_name').value = dashboardName;
+                document.forms[0].action = "{% url 'search_view' %}";
+                document.forms[0].submit();
+                document.getElementById('dashboard_name').value = '';
+            }
+        }
     </script>
 
 </head>
@@ -264,11 +286,13 @@
     <div class="content">
         <form method="post" action="{% url 'search_view' %}">
             {% csrf_token %}
+            <input type="hidden" id="dashboard_name" name="dashboard_name" required>
             <label for="search_text"></label>
             <input type="text" id="search_text" name="search_text" placeholder="Enter your search text">
             <button type="submit" class="submit-button">Search</button>
+            <button type="button" class="save-button" onclick="promptForDashboardName()">💾</button>
 
-            {% if search_text != "" and plot_div != "DISPLAY ERROR MESSAGE" and search_text != "help" and search_text != "help olist"%}
+            {% if search_text != "" and "ERROR" not in error and "help" not in search_text%}
                 <div class="plot-container">
                     <div class="visualization-buttons">
                         <button type="submit" name="plot_type" value="bar" class="visualization-button {% if plot_type == 'bar' %}active{% endif %}">Bar</button>
@@ -276,72 +300,47 @@
                         <button type="submit" name="plot_type" value="scatter" class="visualization-button {% if plot_type == 'scatter' %}active{% endif %}">Scatter</button>
                         <button type="submit" name="plot_type" value="pie" class="visualization-button {% if plot_type == 'pie' %}active{% endif %}">Pie</button>
                     </div>
-                    {{ plot_div | safe }}
+                    {% for pdiv in plot_divs %}
+                        {{ pdiv | safe }}
+                    {% endfor %}
                 </div>
-            {% endif %}
-
-            {% if plot_div == "DISPLAY ERROR MESSAGE"%}
+            {% elif "ERROR" in error %}
                 <div class="error-container">
                     <h1>Error</h1>
                     <p style="margin-bottom:30px">Failed to recognize the query. Please try again later.</p>
                     <a href="{% url 'search_view' %}" class="retry-button">Retry</a>
                 </div>
-            {% endif %}
-
-            {% if search_text == "help" or search_text == "help olist" %}
+                {% for pdiv in plot_divs %}
+                    {{ pdiv | safe }}
+                {% endfor %}
+            {% elif "help" in search_text %}
                 <div class="help-container">
                     <div class="queries">
                         <h1>Help</h1>
-                        <ul>
-                            <li><a href="javascript:void(0);" onclick="setQuery('show payment value data by payment type')">show payment value data by payment type</a></li>
-                            <li><a href="javascript:void(0);" onclick="setQuery('show another query')">show another query</a></li>
-                        </ul>
+                        {% for query in sample_queries %}
+                            <ul>
+                                <li><a href="javascript:void(0);" onclick="setQuery('{{ query }}')">{{ query }}</a></li>
+                            </ul>
+                        {% endfor %}
                     </div>
 
                     <h1>Measures</h1>
                     <ul>
-                        <li>price</li>
-                        <li>freight value</li>
-                        <li>payment installments</li>
-                        <li>payment value</li>
-                        <li>review score</li>
-                        <li>product stock</li>
-                        <li>product weight</li>
-                        <li>product length</li>
-                        <li>product width</li>
-                        <li>product height</li>
+                        {% for measure in measures %}
+                            <li>{{measure}}</li>
+                        {% endfor %}
                     </ul>
 
                     <h1>Dimensions</h1>
                     <ul>
-                        <li>customer zip code</li>
-                        <li>customer city</li>
-                        <li>customer state</li>
-                        <li>latitude</li>
-                        <li>longitude</li>
-                        <li>geolocation city</li>
-                        <li>geolocation state</li>
-                        <li>shipping limit date</li>
-                        <li>payment sequential</li>
-                        <li>payment type</li>
-                        <li>review comment title</li>
-                        <li>review comment message</li>
-                        <li>review creation date</li>
-                        <li>review answer timestamp</li>
-                        <li>order status</li>
-                        <li>order purchase timestamp</li>
-                        <li>order approved at</li>
-                        <li>order delivered carrier date</li>
-                        <li>order delivered customer date</li>
-                        <li>order estimated delivery date</li>
-                        <li>product category name</li>
-                        <li>product name length</li>
-                        <li>product description length</li>
-                        <li>seller zip code</li>
-                        <li>seller city</li>
-                        <li>seller state</li>
+                        {% for dim in dimensions %}
+                            <li>{{dim}}</li>
+                        {% endfor %}
                     </ul>
                 </div>
+                {% for pdiv in plot_divs %}
+                    {{ pdiv | safe }}
+                {% endfor %}
             {% endif %}
         </form>
     </div>
