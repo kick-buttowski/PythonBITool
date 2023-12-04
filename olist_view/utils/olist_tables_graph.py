@@ -9,6 +9,7 @@ relationships = [
     ('olist_view_orderitem', 'seller_id', 'olist_view_seller'),
     ('olist_view_seller', 'zip_code_prefix', 'olist_view_geolocation'),
     ('olist_view_geolocation', 'zip_code_prefix', 'olist_view_customer'),
+    ('olist_view_gamestopstockdata', 'dummy', 'olist_view_gamestopstockdata'),
 ]
 
 G = nx.Graph()

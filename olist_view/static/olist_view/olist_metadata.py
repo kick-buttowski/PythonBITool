@@ -1,5 +1,10 @@
 def get_olist_sample_queries():
-    return ['show payment value data by payment type']
+    return ['show payment value data by payment type',
+            'show average review score data between 3 and 4 grouped by customer state',
+            'show top 15 price by customer state',
+            'show stock data by shipping limit date',
+            'show price by customer state where payment type = credit_card'
+            ]
 
 
 def get_olist_measures():

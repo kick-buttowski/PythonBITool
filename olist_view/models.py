@@ -67,9 +67,9 @@ class OrderItem(models.Model):
     shipping_limit_date = models.DateTimeField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     freight_value = models.DecimalField(max_digits=10, decimal_places=2)
-    orderitem_order_id = models.ForeignKey(Order, on_delete=models.CASCADE, db_column='orderitem_order_id', default=1)
-    orderitem_product_id = models.ForeignKey(Product, on_delete=models.CASCADE, db_column='orderitem_product_id', default=1)
-    orderitem_seller_id = models.ForeignKey(Seller, on_delete=models.CASCADE, db_column='orderitem_seller_id', default=1)
+    order_id = models.ForeignKey(Order, on_delete=models.CASCADE, db_column='order_id', default=1)
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE, db_column='product_id', default=1)
+    seller_id = models.ForeignKey(Seller, on_delete=models.CASCADE, db_column='seller_id', default=1)
 
     def __str__(self):
         return f"orderitem: {self.order_id} {self.product_id}"
@@ -123,3 +123,31 @@ class PublicDashboards(models.Model):
 
     def __str__(self):
         return f"{self.dashboard_name} {self.search_text}"
+
+
+class GameStopStockData(models.Model):
+    cob_date = models.DateTimeField()
+    open_price = models.FloatField()
+    high_price = models.FloatField()
+    low_price = models.FloatField()
+    close_price = models.FloatField()
+    volume = models.BigIntegerField()
+    adjclose_price = models.FloatField()
+
+
+class EURUSDForex(models.Model):
+    cob_date = models.DateTimeField()
+    open_price = models.FloatField()
+    high_price = models.FloatField()
+    low_price = models.FloatField()
+    close_price = models.FloatField()
+    volume = models.BigIntegerField()
+
+
+class GameStopAlias(models.Model):
+    aliases = models.CharField(max_length=255, unique=True)
+    column_name = models.CharField(max_length=255, null=False)
+    table_name = models.CharField(max_length=255, null=False)
+
+    def __str__(self):
+        return f"{self.aliases} {self.column_name}"

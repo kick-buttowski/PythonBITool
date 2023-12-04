@@ -1,4 +1,7 @@
 from django.shortcuts import render
+
+from .static.olist_view.gamestop_metadata import get_gamestop_measures, get_gamestop_sample_queries, \
+    get_gamestop_dimensions
 from .static.olist_view.olist_metadata import get_olist_measures, get_olist_dimensions, get_olist_sample_queries
 from .utils.olist_utils import generate_plotly_plot, save_to_dashboard, clear_cache, get_dashboards
 
@@ -9,20 +12,25 @@ def search_view(request):
 
     if request.method == 'POST' and len(dashboard_name) > 0:
         # Default public dashboard, private dashboard feature to be added later
-        print("Here")
         save_to_dashboard('public', dashboard_name)
         clear_cache()
         return render(request, 'olist_view/search_template.html',
                       {'plot_divs': [], 'error': '', 'plot_type': 'bar', 'search_text': ''})
     elif search_text == '':
-        return render(request, 'olist_view/search_template.html',
-                      {'plot_div': '', 'search_text': search_text})
+        return render(request, 'olist_view/search_template.html', {'plot_div': '', 'search_text': ''})
     elif 'help' in str(search_text).lower().strip():
-        return render(request, 'olist_view/search_template.html',
-                      {'plot_divs': generate_plotly_plot('bar', search_text)[1], 'plot_div': '',
-                       'search_text': str(search_text).lower().strip(),
-                       'measures': get_olist_measures(), 'dimensions': get_olist_dimensions(),
-                       'sample_queries': get_olist_sample_queries()})
+        if str(search_text).lower().strip() == 'help' or str(search_text).lower().strip() == 'help olist':
+            return render(request, 'olist_view/search_template.html',
+                          {'plot_divs': generate_plotly_plot('bar', search_text)[1], 'plot_div': '',
+                           'search_text': str(search_text).lower().strip(),
+                           'measures': get_olist_measures(), 'dimensions': get_olist_dimensions(),
+                           'sample_queries': get_olist_sample_queries()})
+        elif str(search_text).lower().strip() == 'help gamestop':
+            return render(request, 'olist_view/search_template.html',
+                          {'plot_divs': generate_plotly_plot('bar', search_text)[1], 'plot_div': '',
+                           'search_text': str(search_text).lower().strip(),
+                           'measures': get_gamestop_measures(), 'dimensions': get_gamestop_dimensions(),
+                           'sample_queries': get_gamestop_sample_queries()})
     else:
         plot_type = request.POST.get('plot_type', 'bar')
         error, plot_divs = generate_plotly_plot(plot_type, search_text)

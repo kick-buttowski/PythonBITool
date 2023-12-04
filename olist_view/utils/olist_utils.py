@@ -1,6 +1,6 @@
 import sqlite3
 
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 import plotly.express as px
 from plotly.offline import plot
 
@@ -46,25 +46,39 @@ def generate_plotly_plot(plot_type, search_text):
             paths = [table_to_model_name(p)[1] for p in path[1:]]
             agg_prefix = ("__".join(paths) + "__") if len(keys) > 0 else ""
             print(agg_prefix + aggregate['column_name'])
+
+            try:
+                queryset = (table_to_model_name(path[0])[0].objects.values(group_by['column_name'])
+                            .annotate(sum=Avg(agg_prefix + aggregate['column_name']) if nlp_result['average']
+                            else Sum(agg_prefix + aggregate['column_name'])))
+            except Exception:
+                queryset = (table_to_model_name(path[0])[0].objects.values(group_by['column_name'])
+                            .annotate(sum=Avg(agg_prefix + aggregate['column_name']) if nlp_result['average']
+                            else Sum(agg_prefix + aggregate['column_name'])))
+
             if nlp_result['intent'] == 'show top':
-                queryset = (table_to_model_name(path[0])[0].objects.values(group_by['column_name'])
-                            .annotate(sum=Sum(agg_prefix + aggregate['column_name']))
-                            .order_by('-sum')[:nlp_result['top_number']])
-                # annotate(sum=Sum(aggregate['column_name'])).order_by('-sum'))[:nlp_result['top_number']]
+                queryset = (queryset.order_by('-sum')[:nlp_result['top_number']])
             elif nlp_result['intent'] == 'show between':
-                queryset = (table_to_model_name(path[0])[0].objects.values(group_by['column_name'])
-                            .annotate(sum=Sum(agg_prefix + aggregate['column_name']))
-                            .filter(sum__gte=nlp_result['range_start'], sum__lte=nlp_result['range_end']).order_by())
+                queryset = (queryset.filter(sum__gte=nlp_result['range_start'], sum__lte=nlp_result['range_end'])
+                            .order_by())
             elif nlp_result['intent'] == 'show filtered':
-                filter_column_icontains = nlp_result['filter_column']['column_name'] + '__icontains'
-                queryset = (table_to_model_name(path[0])[0].objects.values(group_by['column_name'])
-                            .filter(**{filter_column_icontains: nlp_result['filter_value']})
-                            .annotate(sum=Sum(agg_prefix + aggregate['column_name']))
-                            .order_by())
+                path_filter, keys_filter = shortest_path(group_by['table_name'],
+                                                         nlp_result['filter_column']['table_name'])
+                path_keys = [table_to_model_name(p)[1] for p in path_filter[1:]]
+                agg_prefix_keys = ("__".join(keys_filter) + "__") if len(path_keys) > 0 else ""
+                agg_prefix_path_keys = ("__".join(path_keys) + "__") if len(path_keys) > 0 else ""
+                try:
+                    filter_column_icontains = agg_prefix_path_keys + nlp_result['filter_column'][
+                        'column_name'] + '__icontains'
+                    queryset = queryset.filter(**{filter_column_icontains: nlp_result['filter_value']})
+                except Exception:
+                    filter_column_icontains = agg_prefix_keys + nlp_result['filter_column'][
+                        'column_name'] + '__icontains'
+                    queryset = queryset.filter(**{filter_column_icontains: nlp_result['filter_value']})
+                queryset = queryset.order_by()
+                print(queryset)
             elif nlp_result['intent'] == 'show':
-                queryset = (table_to_model_name(path[0])[0].objects.values(group_by['column_name'])
-                            .annotate(sum=Sum(agg_prefix + aggregate['column_name']))
-                            .order_by())
+                queryset = (queryset.order_by())
             else:
                 return ERROR, plot_divs
 
